@@ -125,13 +125,72 @@ Design choice: rust will never automatically create az deep copy of data -> auto
 
 ### Variables & Data Interacting With Clone
 
+We can use the common method `clone()` to make deep copies (copy of heap data, not just stack data)
 
+```rust
+let s = String::from("hello");
+let t = s.clone();
 
+println!("s: {s}, t: {t}"); // no problem, but might be expensive
+```
 
+### Stack-Only Data: Copy
 
+Back to integer example:
 
+```rust
+let a = 1;
+let b = a;
 
+println!("a: {a}, b: {b}"); // no problem
+```
 
+No `clone()` but `a` is still valid? How?
+  
+Size known at runtime and so stored entirely on stack.
+  
+Integers impement the `Copy` _trait_, therefore does not move and is still valid.
+  
+Can't implement `Copy` if we also implement the `Drop` trait.
+
+## Ownership & Functions
+
+```rust
+fn main(){
+  let s = gives_ownership(); // ret value of gives_ownership moved into s
+  let t = String::from("hello"); // r comes into scope
+  let u = takes_and_gives_back(t); // t is moved into takes_and_gives_back, ret value of takes_and_gives_back is moved into u
+  println!("t: {t}"); // compile error because t is no longer valid
+}
+
+fn gives_ownership() -> String {
+  let a = String::from("yours");
+  a
+}
+
+fn takes_and_gives_back(a: String) -> String {
+  a
+}
+```
+
+What if we want to let a function use some variable without taking ownership?
+  
+It's annoying that anything we pass in must come back if we want to use it again:
+
+```rust
+fn main () {
+  let s = String::from("hello");
+  let (t, l) = do_stuff(s);
+  println!("{t}, {l}")
+}
+
+fn do_stuff(s: String) -> (String, usize) {
+  let l = s.len();
+  (s, l)
+}
+```
+
+This does not spark joy... That's why we introduce _references_
 
 
 
