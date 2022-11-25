@@ -41,3 +41,111 @@ fn do_stuff(s: &String) {
 ```
 
 ## Mutable References
+
+We can alwo get a _mutable reference_ to a borrowed value like so:
+
+```rust
+fn main() {
+  let s= String::from("hello");
+  do_stuff(&mut s);
+  println("{s}");
+}
+
+fn do_stuff(s: &mut String) {
+  s.push_str(", world!") // no problem
+}
+```
+
+Restriction: if you have a mutable reference to a variable, no other references to that variable must exist.
+
+```rust
+let mut s = String::from("hello");
+
+let t = &mut s;
+let u = &mut s; // compile error: can't borrow s as mutable more than once
+println!("{s}, {t}, {u}");
+```
+
+This means we can mutate borrowed values, but not always.
+  
+This means yhat rust can prevent _data races_ at compile-time!
+  
+Data race occurs when the following are true:
+* 2 (or more) pointers access the same data at the same time
+* At least one of those pointers writes to the data
+* There's no sync-mechanism to sync access to the data
+  
+There's a similar rule for mutable and immutable references:
+
+```rust
+let mut s = String::from("hello");
+
+let t = &s; // no problem
+let u = &s; // no problem
+let v = &mut s; // compile-error: can't borrow s as mutable because it's also borrowed asa immutable
+```
+
+Note: a reference's scope starts where it's introduced and ends where it is lasr used. So this works:
+
+```rust
+let mut s = String::from("hello");
+let t = &s;
+let u = &s;
+
+println!("{t}, {u}"); // last use of references to s in t and u
+
+let v = &mut s; // no problem
+```
+
+## Dangling References
+
+Dangling pointer = pointer to memory that has been given to someone else.
+  
+Freeing memory but keeping the pointer to that memory.
+  
+In rust, the compiler guarantees that data never goes out of scope before the reference to it goes out of scope.
+  
+I.e., no dangling references. Example:
+
+```rust
+fn main() {
+  let ref_to_nothing = dangle();
+}
+
+fn dangle() -> &String { // compile error: expected lifetime operator
+  let s = String::from("hello");
+  &s
+}
+```
+
+Rust even says
+
+> this function's return type contains a borrowed value, but there is no value
+> for it to be borrowed from
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
