@@ -122,30 +122,3 @@ Rust even says
 
 > this function's return type contains a borrowed value, but there is no value
 > for it to be borrowed from
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
